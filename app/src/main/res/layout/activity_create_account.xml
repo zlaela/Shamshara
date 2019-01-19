@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+	style="@style/ActivityScreenStyle"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+
+	<android.support.v7.widget.AppCompatEditText
+		android:id="@+id/username_text_field"
+		style="@style/AccountInputField"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintTop_toTopOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		android:hint="@string/username"
+		android:inputType="text"
+		android:ems="10"/>
+
+	<android.support.v7.widget.AppCompatEditText
+		android:id="@+id/email_text_field"
+		style="@style/AccountInputField"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintTop_toBottomOf="@id/username_text_field"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		android:inputType="textEmailAddress"
+		android:hint="@string/email"
+		android:ems="10" />
+
+	<android.support.v7.widget.AppCompatEditText
+		android:id="@+id/password_text_field"
+		style="@style/AccountInputField"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintTop_toBottomOf="@id/email_text_field"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		android:ems="10"
+		android:inputType="textPassword"
+		android:hint="@string/password"/>
+
+	<android.support.v7.widget.AppCompatTextView
+		android:id="@+id/create_avatar_text"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintTop_toBottomOf="@id/password_text_field"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		android:layout_margin="@dimen/dp_16"
+		android:text="@string/tap_to_generate_user_avatar"
+		android:textAlignment="center"/>
+
+	<android.support.v7.widget.AppCompatImageView
+		android:id="@+id/avatar_image"
+		android:layout_width="@dimen/dp_125"
+		android:layout_height="@dimen/dp_125"
+		app:layout_constraintTop_toBottomOf="@id/create_avatar_text"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		android:layout_margin="@dimen/dp_8"
+		android:background="@android:color/transparent"
+		android:src="@drawable/profiledefault"
+		android:scaleType="fitXY"
+		android:onClick="onMakeAvatarClicked"
+		/>
+
+	<android.support.v7.widget.AppCompatButton
+		android:id="@+id/generate_background_color"
+		style="@style/WideButtonStyle"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintTop_toBottomOf="@id/avatar_image"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		android:text="@string/generate_background_color"
+		android:onClick="onGenerateBackgroundColorClicked"
+		/>
+
+	<android.support.v7.widget.AppCompatButton
+		android:id="@+id/sign_up"
+		style="@style/WideButtonStyle"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		android:text="@string/create_account"
+		android:onClick="onSignUpClicked"
+		/>
+
+</android.support.constraint.ConstraintLayout>

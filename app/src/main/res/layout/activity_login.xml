@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+	style="@style/ActivityScreenStyle"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	xmlns:app="http://schemas.android.com/apk/res-auto">
+
+	<android.support.v7.widget.AppCompatEditText
+		android:id="@+id/email_text_field"
+		style="@style/AccountInputField"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintTop_toTopOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		android:inputType="textEmailAddress"
+		android:hint="@string/email"
+		android:ems="10" />
+
+	<android.support.v7.widget.AppCompatEditText
+		android:id="@+id/password_text_field"
+		style="@style/AccountInputField"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toBottomOf="@id/email_text_field"
+		android:ems="10"
+		android:inputType="textPassword"
+		android:hint="@string/password"/>
+
+	<android.support.v7.widget.AppCompatButton
+		android:id="@+id/login_button"
+		style="@style/WideButtonStyle"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintTop_toBottomOf="@id/password_text_field"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		android:text="@string/log_in"
+		android:onClick="onLoginClicked"
+		/>
+
+	<android.support.v7.widget.AppCompatTextView
+		android:id="@+id/text"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toBottomOf="@id/login_button"
+		android:layout_margin="@dimen/dp_32"
+		android:text="@string/create_account_prompt"
+		android:textAlignment="center"/>
+
+	<android.support.v7.widget.AppCompatButton
+		android:id="@+id/sign_up"
+		style="@style/WideButtonStyle"
+		android:layout_width="@dimen/match_constraint"
+		android:layout_height="wrap_content"
+		app:layout_constraintTop_toBottomOf="@id/text"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		android:text="@string/create_account"
+		android:onClick="onCreateAccountClicked"
+		/>
+</android.support.constraint.ConstraintLayout>

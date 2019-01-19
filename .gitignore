@@ -1,0 +1,36 @@
+# App/build files
+*.apk
+*.apk_
+
+
+# Java class files
+*.class
+
+
+# Android Studio captures
+captures/
+
+
+#IDE Specific Files
+*.iml
+*.ipr
+*.iws
+.idea/
+
+
+# Local config file
+local.properties
+
+
+# Log Files
+*.log
+
+
+# Gradle files
+.externalNativeBuild
+.gradle/
+build/
+
+
+# Desktop Services Store
+.DS_Store
