@@ -8,7 +8,7 @@
     android:layout_margin="@dimen/dp_16"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_main"
-    tools:context=".MainActivity">
+    tools:context=".activities.MainActivity">
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/login_prompt"

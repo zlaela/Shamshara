@@ -1,4 +1,4 @@
-package net.tribls.shamshara
+package net.tribls.shamshara.activities
 
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_create_account.*
+import net.tribls.shamshara.R
+import net.tribls.shamshara.services.AuthService
 import java.util.*
 
 class CreateAccountActivity : AppCompatActivity() {
@@ -27,7 +29,15 @@ class CreateAccountActivity : AppCompatActivity() {
     }
 
     fun onSignUpClicked(view: View) {
-        Toast.makeText(this, "clicked sign up", Toast.LENGTH_SHORT).show()
+        // TODO: Get the email address and password from the edittexts
+        AuthService.registerUser(this, "test2@test.com", "password1234"){ complete->
+            if(complete){
+                Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show()
+            } else {
+
+                Toast.makeText(this, "Failed to create account", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
 

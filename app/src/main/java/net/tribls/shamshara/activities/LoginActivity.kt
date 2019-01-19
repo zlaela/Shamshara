@@ -1,10 +1,11 @@
-package net.tribls.shamshara
+package net.tribls.shamshara.activities
 
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
+import net.tribls.shamshara.R
 
 class LoginActivity : AppCompatActivity() {
 
