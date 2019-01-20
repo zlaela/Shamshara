@@ -149,9 +149,6 @@ object AuthService {
             URL_CREATE_USER,
             null,
             Listener { response->
-                // Success listener
-                println("lailaaaa... response is $response")
-
                 // Add the values to the data user service
                 // If there are no matching maps, catch the exception
                 try {
@@ -216,11 +213,11 @@ object AuthService {
                     LocalBroadcastManager.getInstance(context).sendBroadcast(userDataChange)
                     complete(true)
                 } catch (e: JSONException) {
-                    Log.d("JSON", "EXC: " + e.localizedMessage)
+                    Log.d(TAG, "JSON Exception: " + e.localizedMessage)
                 }
 
             }, Response.ErrorListener { error ->
-                Log.d("ERROR", "Could not find user.")
+                Log.d(TAG, "Could not find user.")
                 complete(false)
             }) {
 

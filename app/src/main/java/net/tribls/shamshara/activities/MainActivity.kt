@@ -17,6 +17,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import io.socket.client.IO
 import io.socket.emitter.Emitter
@@ -32,10 +33,10 @@ import net.tribls.shamshara.utils.BROADCAST_USER_DATA_CHANGED
 import net.tribls.shamshara.utils.SOCKET_URL
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var channelAdapter: ArrayAdapter<Channel>
     private val socket = IO.socket(SOCKET_URL)
-
     private val userDataChangedReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
+        override fun onReceive(context: Context, intent: Intent?) {
             // When we received the broadcast
             if(AuthService.isLoggedIn) {
                 // update the UI elements
@@ -49,10 +50,17 @@ class MainActivity : AppCompatActivity() {
                 user_name.text = UserDataService.name
                 user_email.text = UserDataService.email
                 login.text = getString(R.string.log_out)
+
+                // Once the user is logged in, get the list of channels
+                MessageService.getChannels(context){ success ->
+                    if(success) {
+                        // Tell the adapter that the data set changed so it repopulates
+                        channelAdapter.notifyDataSetChanged()
+                    }
+                }
             }
         }
     }
-
     private val channelCreatedListener = Emitter.Listener { args ->
         // The API emits channel.name, channel.description, channel.id.
         // This is performed on a background thread, so update the list view on the main thread
@@ -66,6 +74,8 @@ class MainActivity : AppCompatActivity() {
 
             // Save it to the MessageService array
             MessageService.channels.add(newChannel)
+            // Tell the adapter that a new channel was added so it can re-populate
+            channelAdapter.notifyDataSetChanged()
         }
     }
 
@@ -84,6 +94,9 @@ class MainActivity : AppCompatActivity() {
         )
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
+
+        // setup the adapter for the list of channels
+        setupAdapter()
 
         // Connect the socket
         socket.connect()
@@ -182,11 +195,16 @@ class MainActivity : AppCompatActivity() {
         login.text = getString(R.string.log_in)
     }
 
-
     private fun hideKeyboard() {
         val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         if(inputManager.isAcceptingText) {
             inputManager.hideSoftInputFromWindow(currentFocus.windowToken, 0)
         }
+    }
+
+    // Create an adapter for the list of channels we get from the db
+    private fun setupAdapter() {
+        channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MessageService.channels)
+        channel_list.adapter = channelAdapter
     }
 }
