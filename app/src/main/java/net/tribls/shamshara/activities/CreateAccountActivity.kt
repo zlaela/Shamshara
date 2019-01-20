@@ -29,17 +29,29 @@ class CreateAccountActivity : AppCompatActivity() {
     }
 
     fun onSignUpClicked(view: View) {
-        // TODO: Get the email address and password from the edittexts
-        AuthService.registerUser(this, "test2@test.com", "password1234"){ complete->
+        // Get the username and password from the edittexts
+        val email = email_text_field.text.toString()
+        val password = password_text_field.text.toString()
+
+        // Create the user account
+        AuthService.registerUser(this, email, password){ complete->
+            // If created successfully, log in the user
             if(complete){
                 Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show()
+                AuthService.loginUser(this, email, password) { loginSuccess->
+                    if(loginSuccess) {
+                        Toast.makeText(this, "Log In completed successfully", Toast.LENGTH_SHORT).show()
+                    } else {
+                        // TODO: handle errors
+                        Toast.makeText(this, "Log In failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
             } else {
-
+                // TODO: handle errors
                 Toast.makeText(this, "Failed to create account", Toast.LENGTH_SHORT).show()
             }
         }
     }
-
 
     private fun getRandomImage() {
         val random = Random()
