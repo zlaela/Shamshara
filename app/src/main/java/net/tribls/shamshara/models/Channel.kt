@@ -7,7 +7,7 @@ package net.tribls.shamshara.models
  * @param description - the description of the channl
  * @param id - the ID of the channel
  * **/
-class Channel(private val name: String,
+class Channel(val name: String,
               private val description: String,
               private val id: String){
 
@@ -15,6 +15,6 @@ class Channel(private val name: String,
      * Because we'll be working with a list view, we'll use the list of channels and use toString to display the name
      */
     override fun toString(): String {
-        return "#$name"
+        return "# $name"
     }
 }

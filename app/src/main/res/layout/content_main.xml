@@ -11,7 +11,7 @@
     tools:context=".activities.MainActivity">
 
     <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/login_prompt"
+        android:id="@+id/current_channel_name"
         android:layout_width="@dimen/match_constraint"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -19,13 +19,14 @@
         app:layout_constraintRight_toRightOf="parent"
         android:padding="@dimen/dp_8"
         android:textAlignment="center"
+	    android:textSize="16sp"
         android:text="@string/please_log_in"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messages_recycler_view"
         android:layout_width="@dimen/match_constraint"
         android:layout_height="@dimen/match_constraint"
-        app:layout_constraintTop_toBottomOf="@id/login_prompt"
+        app:layout_constraintTop_toBottomOf="@id/current_channel_name"
         app:layout_constraintBottom_toTopOf="@+id/message_text_field"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,6 +54,5 @@
         android:background="@android:color/transparent"
         android:src="@drawable/ic_menu_send"
         android:tint="@color/colorPrimary"
-        android:onClick="onSendMessageClicked"
         />
 </android.support.constraint.ConstraintLayout>

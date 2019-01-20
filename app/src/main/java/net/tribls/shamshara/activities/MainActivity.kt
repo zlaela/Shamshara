@@ -12,6 +12,8 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatEditText
+import android.support.v7.widget.AppCompatImageButton
+import android.support.v7.widget.AppCompatTextView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,6 +24,7 @@ import io.socket.client.IO
 import io.socket.emitter.Emitter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 import net.tribls.shamshara.App
 import net.tribls.shamshara.R
@@ -32,9 +35,13 @@ import net.tribls.shamshara.services.UserDataService
 import net.tribls.shamshara.utils.BROADCAST_USER_DATA_CHANGED
 import net.tribls.shamshara.utils.SOCKET_URL
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var channelAdapter: ArrayAdapter<Channel>
     private val socket = IO.socket(SOCKET_URL)
+
+    private var selectedChannel: Channel? = null
+
+    // Listeners and Receivers
     private val userDataChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             // When we received the broadcast
@@ -54,8 +61,14 @@ class MainActivity : AppCompatActivity() {
                 // Once the user is logged in, get the list of channels
                 MessageService.getChannels { success ->
                     if(success) {
-                        // Tell the adapter that the data set changed so it repopulates
-                        channelAdapter.notifyDataSetChanged()
+                        // If we have channels, default to the first one
+                        if(MessageService.channels.size > 0) {
+                            selectedChannel = MessageService.channels[0]
+                            // Tell the adapter that the data set changed so it repopulates
+                            channelAdapter.notifyDataSetChanged()
+                            // Update the UI with the channel name
+                            updateWithSelectedChannel()
+                        }
                     }
                 }
             }
@@ -71,7 +84,6 @@ class MainActivity : AppCompatActivity() {
 
             // Create a channel object
             val newChannel  = Channel(channelName, channelDesc, channelId)
-
             // Save it to the MessageService array
             MessageService.channels.add(newChannel)
             // Tell the adapter that a new channel was added so it can re-populate
@@ -117,6 +129,14 @@ class MainActivity : AppCompatActivity() {
             IntentFilter(BROADCAST_USER_DATA_CHANGED)
         )
         super.onResume()
+        channel_list.setOnItemClickListener { _, _, i, _ ->
+            // Set the selected channel to the one clicked
+           selectedChannel = MessageService.channels[i]
+            // Close the drawer
+            drawer_layout.closeDrawer(GravityCompat.START)
+            // Update the UI
+            updateWithSelectedChannel()
+        }
     }
 
     override fun onDestroy() {
@@ -135,7 +155,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onGoToLoginClicked(view: View) {
+    override fun onClick(view: View?) {
+        when(view){
+            findViewById<AppCompatTextView>(R.id.login) -> onGoToLoginClicked()
+            findViewById<AppCompatImageButton>(R.id.add_channel) -> onAddChannelClicked()
+            findViewById<AppCompatImageButton>(R.id.send_message) -> onSendMessageClicked()
+        }
+    }
+
+    private fun onGoToLoginClicked() {
         if(App.sharedPrefs.isLoggedIn){
             // Log Out
             UserDataService.logOut()
@@ -151,7 +179,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onAddChannelClicked(view: View) {
+    private fun onAddChannelClicked() {
         // Only logged in person can add a channel
         if(App.sharedPrefs.isLoggedIn) {
             val builder = AlertDialog.Builder(this)
@@ -174,7 +202,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun onSendMessageClicked(view: View) {
+    private fun onSendMessageClicked() {
         // TODO: send message work here
         Toast.makeText(this, "clicked send message", Toast.LENGTH_SHORT).show()
     }
@@ -216,5 +244,11 @@ class MainActivity : AppCompatActivity() {
     private fun setupAdapter() {
         channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MessageService.channels)
         channel_list.adapter = channelAdapter
+    }
+
+    // Function called whenever we select a channel from the populated list of channels
+    private fun updateWithSelectedChannel() {
+        current_channel_name.text = String.format(getString(R.string.channel_name_format), selectedChannel?.name)
+        // TODO: download messages for channel
     }
 }

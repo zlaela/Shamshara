@@ -3,9 +3,9 @@ package net.tribls.shamshara.activities
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -16,9 +16,8 @@ import net.tribls.shamshara.utils.BROADCAST_USER_DATA_CHANGED
 import java.util.*
 
 class CreateAccountActivity : AppCompatActivity() {
-
-    var userAvatar = "profileDefault"
-    var avatarColor = "[0.5, 0.5, 0.5, 1]"
+    private var userAvatar = "profileDefault"
+    private var avatarColor = "[0.5, 0.5, 0.5, 1]"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
