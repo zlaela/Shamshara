@@ -9,6 +9,7 @@
 
     <!-- Constraints  -->
     <dimen name="match_constraint">0dp</dimen>
+    <dimen name="icon_size">64dp</dimen>
     <dimen name="dp_8">8dp</dimen>
     <dimen name="dp_16">16dp</dimen>
     <dimen name="dp_24">24dp</dimen>

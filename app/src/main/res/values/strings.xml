@@ -16,4 +16,8 @@
 	<string name="email">Email</string>
 	<string name="tap_to_generate_user_avatar">Tap to generate user avatar</string>
 	<string name="generate_background_color">Generate background color</string>
+	<string name="log_out">Log Out</string>
+	<string name="channel_name">Channel Name</string>
+	<string name="channel_description">Channel Description</string>
+	<string name="add_channel">Add Channel</string>
 </resources>

@@ -5,50 +5,57 @@
 	android:id="@+id/linearLayout"
 	android:layout_width="match_parent"
 	android:layout_height="@dimen/nav_header_height"
+	android:padding="@dimen/dp_8"
 	android:background="@drawable/side_nav_bar"
 	android:gravity="bottom"
 	android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-	<ImageView
+	<android.support.v7.widget.AppCompatImageView
 		android:id="@+id/user_image"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_margin="16dp"
-		android:contentDescription="@string/nav_header_desc"
+		android:layout_width="@dimen/icon_size"
+		android:layout_height="@dimen/icon_size"
 		app:layout_constraintBottom_toTopOf="@id/login"
 		app:layout_constraintStart_toStartOf="parent"
-		app:srcCompat="@mipmap/ic_launcher_round" />
+		android:layout_marginBottom="@dimen/dp_8"
+		android:contentDescription="@string/nav_header_desc"
+		app:srcCompat="@drawable/profiledefault"
+		android:background="@color/colorPrimary"
+		/>
 
 	<android.support.v7.widget.AppCompatTextView
 		android:id="@+id/user_name"
 		android:layout_width="@dimen/match_constraint"
 		android:layout_height="wrap_content"
-		app:layout_constraintBottom_toTopOf="@+id/user_email"
+		app:layout_constraintTop_toTopOf="@id/user_image"
+		app:layout_constraintBottom_toTopOf="@id/user_email"
 		app:layout_constraintStart_toEndOf="@+id/user_image"
-		app:layout_constraintTop_toTopOf="@+id/user_image"
-		android:layout_margin="16dp"
+		android:layout_marginStart="@dimen/dp_8"
 		android:text="@string/nav_header_title"
-		android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+		android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+		/>
 
 	<android.support.v7.widget.AppCompatTextView
 		android:id="@+id/user_email"
 		android:layout_width="@dimen/match_constraint"
 		android:layout_height="wrap_content"
-		app:layout_constraintBottom_toBottomOf="@+id/user_image"
-		app:layout_constraintStart_toEndOf="@+id/user_image"
-		android:layout_marginStart="16dp"
-		android:text="@string/nav_header_subtitle" />
+		android:text="@string/nav_header_subtitle"
+		app:layout_constraintTop_toBottomOf="@id/user_name"
+		app:layout_constraintBottom_toBottomOf="@id/user_image"
+		app:layout_constraintStart_toStartOf="@+id/user_name"
+		/>
 
 	<android.support.v7.widget.AppCompatButton
 		android:id="@+id/login"
-		android:layout_width="wrap_content"
+		android:layout_width="@dimen/match_constraint"
 		android:layout_height="@dimen/dp_32"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
-		android:layout_margin="16dp"
+		android:layout_marginStart="@dimen/dp_8"
 		android:background="@android:color/transparent"
+		android:textAlignment="textStart"
 		android:text="@string/log_in"
-		android:onClick="onGoToLoginClicked"/>
+		android:onClick="onGoToLoginClicked"
+		/>
 
 	<android.support.v7.widget.AppCompatImageButton
 		android:id="@+id/add_channel"
@@ -56,10 +63,10 @@
 		android:layout_height="@dimen/dp_24"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
-		android:layout_margin="16dp"
 		android:scaleType="fitXY"
 		android:background="@android:color/transparent"
 		android:src="@drawable/ic_menu_add"
-		android:onClick="onAddChannelClicked"/>
+		android:onClick="onAddChannelClicked"
+		/>
 
 </android.support.constraint.ConstraintLayout>
