@@ -45,13 +45,13 @@ class CreateAccountActivity : AppCompatActivity() {
         val password = password_text_field.text.toString()
 
         // Create the user account
-        AuthService.registerUser(this, email, password){ complete->
+        AuthService.registerUser(email, password){ complete->
             // If created successfully, log in the user
             if(complete){
-                AuthService.loginUser(this, email, password) { loginSuccess->
+                AuthService.loginUser(email, password) { loginSuccess->
                     if(loginSuccess) {
                         // Add the user with its avatar and background color
-                        AuthService.createUser(this, username, email, userAvatar, avatarColor){ createSuccess ->
+                        AuthService.createUser(username, email, userAvatar, avatarColor){ createSuccess ->
                             if(createSuccess){
 
                                 // Tell the main activity that we have successfully logged in

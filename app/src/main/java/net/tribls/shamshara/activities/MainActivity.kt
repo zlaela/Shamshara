@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Looper
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
@@ -24,6 +23,7 @@ import io.socket.emitter.Emitter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
+import net.tribls.shamshara.App
 import net.tribls.shamshara.R
 import net.tribls.shamshara.models.Channel
 import net.tribls.shamshara.services.AuthService
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     private val userDataChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             // When we received the broadcast
-            if(AuthService.isLoggedIn) {
+            if(App.sharedPrefs.isLoggedIn) {
                 // update the UI elements
                 val imageResourceId = resources.getIdentifier(
                     UserDataService.avatarName,
@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                 login.text = getString(R.string.log_out)
 
                 // Once the user is logged in, get the list of channels
-                MessageService.getChannels(context){ success ->
+                MessageService.getChannels { success ->
                     if(success) {
                         // Tell the adapter that the data set changed so it repopulates
                         channelAdapter.notifyDataSetChanged()
@@ -97,11 +97,17 @@ class MainActivity : AppCompatActivity() {
 
         // setup the adapter for the list of channels
         setupAdapter()
-
         // Connect the socket
         socket.connect()
         // Listen on the event, using the given listener
         socket.on("channelCreated", channelCreatedListener)
+
+        // If we're logged in, go ahead and fetch the information
+        if(App.sharedPrefs.isLoggedIn) {
+            AuthService.findUserByEmail(this){
+                //No-op
+            }
+        }
     }
 
     override fun onResume() {
@@ -130,9 +136,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onGoToLoginClicked(view: View) {
-        if(AuthService.isLoggedIn){
+        if(App.sharedPrefs.isLoggedIn){
             // Log Out
             UserDataService.logOut()
+            // clear the list of channels
+            MessageService.channels.clear()
+            channelAdapter.notifyDataSetChanged()
+
             resetUI()
         } else {
             // Go to the login screen
@@ -143,7 +153,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onAddChannelClicked(view: View) {
         // Only logged in person can add a channel
-        if(AuthService.isLoggedIn) {
+        if(App.sharedPrefs.isLoggedIn) {
             val builder = AlertDialog.Builder(this)
             val dialogView = layoutInflater.inflate(R.layout.add_channel_dialog, null)
             builder.setView(dialogView)
@@ -190,7 +200,7 @@ class MainActivity : AppCompatActivity() {
     private fun resetUI(){
         user_image.setImageResource(R.drawable.profiledefault)
         user_image.setBackgroundColor(Color.TRANSPARENT)
-        user_name.text = ""
+        user_name.text = getString(R.string.log_in)
         user_email.text = ""
         login.text = getString(R.string.log_in)
     }

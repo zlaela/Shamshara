@@ -1,10 +1,9 @@
 package net.tribls.shamshara.services
 
-import android.content.Context
 import android.util.Log
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.Volley
+import net.tribls.shamshara.App
 import net.tribls.shamshara.models.Channel
 import net.tribls.shamshara.utils.URL_GET_CHANNELS
 import org.json.JSONException
@@ -20,7 +19,7 @@ object MessageService {
     val channels = ArrayList<Channel>()
 
     // This is a GET request, so no reason for a request body
-    fun getChannels(context: Context, complete: (Boolean) -> Unit) {
+    fun getChannels(complete: (Boolean) -> Unit) {
         val getChannelsRequest = object : JsonArrayRequest(
             Method.GET,
             URL_GET_CHANNELS,
@@ -39,7 +38,7 @@ object MessageService {
                         val description = channel.getString("description")
 
                         // Add each channel to the list of channels in the MessageService
-                        MessageService.channels.add(
+                        channels.add(
                             Channel(name, description, id)
                         )
                     }
@@ -60,13 +59,13 @@ object MessageService {
 
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
-                headers["authorization"] = "Bearer ${AuthService.authToken}"
+                headers["authorization"] = "Bearer ${App.sharedPrefs.authToken}"
 
                 return headers
             }
         }
 
         // Add the request to the request queue
-        Volley.newRequestQueue(context).add(getChannelsRequest)
+        App.sharedPrefs.requestQueue.add(getChannelsRequest)
     }
 }

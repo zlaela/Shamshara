@@ -22,7 +22,7 @@ class LoginActivity : AppCompatActivity() {
         val password = password_text_field.text.toString()
 
         // Log in the user
-        AuthService.loginUser(this, email, password) { loginSuccess ->
+        AuthService.loginUser(email, password) { loginSuccess ->
             if (loginSuccess) {
                 AuthService.findUserByEmail(this) { fetchUserSuccess ->
 

@@ -1,6 +1,7 @@
 package net.tribls.shamshara.services
 
 import android.graphics.Color
+import net.tribls.shamshara.App
 
 object UserDataService {
     var id = ""
@@ -15,9 +16,11 @@ object UserDataService {
         email = ""
         avatarColor = ""
         avatarName = ""
-        AuthService.authToken = ""
-        AuthService.userEmail = ""
-        AuthService.isLoggedIn = false
+
+        // Save to shared preferences
+        App.sharedPrefs.authToken = ""
+        App.sharedPrefs.userEmail = ""
+        App.sharedPrefs.isLoggedIn = false
     }
 
     fun getAvatarColor(): Int {
