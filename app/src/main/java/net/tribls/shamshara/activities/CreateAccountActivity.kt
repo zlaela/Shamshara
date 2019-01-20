@@ -30,6 +30,7 @@ class CreateAccountActivity : AppCompatActivity() {
 
     fun onSignUpClicked(view: View) {
         // Get the username and password from the edittexts
+        val username = username_text_field.text.toString()
         val email = email_text_field.text.toString()
         val password = password_text_field.text.toString()
 
@@ -41,6 +42,17 @@ class CreateAccountActivity : AppCompatActivity() {
                 AuthService.loginUser(this, email, password) { loginSuccess->
                     if(loginSuccess) {
                         Toast.makeText(this, "Log In completed successfully", Toast.LENGTH_SHORT).show()
+                        // Add the user with its avatar and background color
+                        AuthService.createUser(this, username, email, userAvatar, avatarColor){ createSuccess ->
+                            if(createSuccess){
+                                Toast.makeText(this, "User added successfully", Toast.LENGTH_SHORT).show()
+                                // Finish this activity
+                                finish()
+                            } else {
+
+                                Toast.makeText(this, "Failed to create user", Toast.LENGTH_LONG).show()
+                            }
+                        }
                     } else {
                         // TODO: handle errors
                         Toast.makeText(this, "Log In failed", Toast.LENGTH_SHORT).show()
