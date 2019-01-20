@@ -6,26 +6,34 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Looper
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.AppCompatTextView
+import android.support.v7.widget.AppCompatEditText
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import io.socket.client.IO
+import io.socket.emitter.Emitter
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 import net.tribls.shamshara.R
+import net.tribls.shamshara.models.Channel
 import net.tribls.shamshara.services.AuthService
+import net.tribls.shamshara.services.MessageService
 import net.tribls.shamshara.services.UserDataService
 import net.tribls.shamshara.utils.BROADCAST_USER_DATA_CHANGED
+import net.tribls.shamshara.utils.SOCKET_URL
 
 class MainActivity : AppCompatActivity() {
+    private val socket = IO.socket(SOCKET_URL)
+
     private val userDataChangedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             // When we received the broadcast
@@ -45,6 +53,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val channelCreatedListener = Emitter.Listener { args ->
+        // The API emits channel.name, channel.description, channel.id.
+        // This is performed on a background thread, so update the list view on the main thread
+        runOnUiThread {
+            val channelName = args[0] as String
+            val channelDesc = args[1] as String
+            val channelId = args[2] as String
+
+            // Create a channel object
+            val newChannel  = Channel(channelName, channelDesc, channelId)
+
+            // Save it to the MessageService array
+            MessageService.channels.add(newChannel)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -61,11 +85,27 @@ class MainActivity : AppCompatActivity() {
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
+        // Connect the socket
+        socket.connect()
+        // Listen on the event, using the given listener
+        socket.on("channelCreated", channelCreatedListener)
+    }
+
+    override fun onResume() {
         // Register a broadcast receiver
         LocalBroadcastManager.getInstance(this).registerReceiver(
             userDataChangedReceiver,
             IntentFilter(BROADCAST_USER_DATA_CHANGED)
         )
+        super.onResume()
+    }
+
+    override fun onDestroy() {
+        // Disconnect the socket
+        socket.disconnect()
+        // Unregister the broadcast receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(userDataChangedReceiver)
+        super.onDestroy()
     }
 
     override fun onBackPressed() {
@@ -95,12 +135,13 @@ class MainActivity : AppCompatActivity() {
             val dialogView = layoutInflater.inflate(R.layout.add_channel_dialog, null)
             builder.setView(dialogView)
                 .setPositiveButton("Add") { dialogInterface, i ->
-                    // When clicked, do something
-                    val channelName = dialogView.findViewById<AppCompatTextView>(R.id.add_channel_name).text.toString()
-                    val channelDescription = dialogView.findViewById<AppCompatTextView>(R.id.add_channel_description).text.toString()
                     hideKeyboard()
+                    // When clicked, do something
+                    val channelName = dialogView.findViewById<AppCompatEditText>(R.id.add_channel_name).text.toString()
+                    val channelDescription = dialogView.findViewById<AppCompatEditText>(R.id.add_channel_description).text.toString()
 
-                    // TODO: create channel with the above name/desc
+                    // Create channel with the above name/desc
+                    socket.emit("newChannel", channelName, channelDescription)
                 }
                 .setNegativeButton("Cancel") { dialogInterface, i ->
                     // Cancel and close the dialog

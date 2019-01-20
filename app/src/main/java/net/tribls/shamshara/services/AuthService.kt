@@ -1,15 +1,16 @@
 package net.tribls.shamshara.services
 
 import android.content.Context
+import android.content.Intent
+import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.android.volley.Request
 import com.android.volley.Response
+import com.android.volley.Response.Listener
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import net.tribls.shamshara.utils.URL_CREATE_USER
-import net.tribls.shamshara.utils.URL_LOGIN
-import net.tribls.shamshara.utils.URL_REGISTER
+import net.tribls.shamshara.utils.*
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -44,7 +45,7 @@ object AuthService {
         val registerRequest = object : StringRequest(
             Request.Method.POST,
             URL_REGISTER,
-            Response.Listener { response->
+            Listener { response->
                 // Success listener
                 println("lailaaaa... response is $response")
                 complete(true)
@@ -89,7 +90,7 @@ object AuthService {
             Request.Method.POST,
             URL_LOGIN,
             null,
-            Response.Listener { response->
+            Listener { response->
                 // Success listener
                 println("lailaaaa... response is $response")
                 // If there are no matching maps, catch the exception
@@ -147,7 +148,7 @@ object AuthService {
             Request.Method.POST,
             URL_CREATE_USER,
             null,
-            Response.Listener { response->
+            Listener { response->
                 // Success listener
                 println("lailaaaa... response is $response")
 
@@ -192,5 +193,49 @@ object AuthService {
 
         // Add the request to the RequestQueue.
         Volley.newRequestQueue(context).add(addUserRequest)
+    }
+
+    // This only takes a context - only a GET request
+    fun findUserByEmail(context: Context, complete: (Boolean) -> Unit) {
+        // No JSON body required - go straight to the request
+        val findUserRequest = object: JsonObjectRequest(
+            Method.GET,
+            "$URL_GET_USER$userEmail",
+            null,
+            Listener { response ->
+                try {
+                    // Extract the user's information from the response and add it to the service
+                    UserDataService.id = response.getString("_id")
+                    UserDataService.name = response.getString("name")
+                    UserDataService.email = response.getString("email")
+                    UserDataService.avatarColor = response.getString("avatarColor")
+                    UserDataService.avatarName = response.getString("avatarName")
+
+                    // Tell anyone listening that the user's data has changed
+                    val userDataChange = Intent(BROADCAST_USER_DATA_CHANGED)
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(userDataChange)
+                    complete(true)
+                } catch (e: JSONException) {
+                    Log.d("JSON", "EXC: " + e.localizedMessage)
+                }
+
+            }, Response.ErrorListener { error ->
+                Log.d("ERROR", "Could not find user.")
+                complete(false)
+            }) {
+
+                override fun getBodyContentType(): String {
+                    return "application/json; charset=utf-8"
+                }
+
+                override fun getHeaders(): MutableMap<String, String> {
+                    val headers = HashMap<String, String>()
+                    headers["Authorization"] = "Bearer $authToken"
+                    return headers
+                }
+            }
+
+        // Add the request to the RequestQueue.
+        Volley.newRequestQueue(context).add(findUserRequest)
     }
 }

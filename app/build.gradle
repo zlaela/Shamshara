@@ -32,6 +32,12 @@ dependencies {
     // Volley for networking calls
     implementation 'com.android.volley:volley:1.1.1'
 
+    // Socket.IO for websockets
+    implementation ('io.socket:socket.io-client:1.0.0') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
