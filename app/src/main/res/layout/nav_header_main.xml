@@ -54,6 +54,7 @@
 		android:background="@android:color/transparent"
 		android:textAlignment="textStart"
 		android:text="@string/log_in"
+		android:onClick="onGoToLoginClicked"
 		/>
 
 	<android.support.v7.widget.AppCompatImageButton
@@ -65,6 +66,7 @@
 		android:scaleType="fitXY"
 		android:background="@android:color/transparent"
 		android:src="@drawable/ic_menu_add"
+		android:onClick="onAddChannelClicked"
 		/>
 
 </android.support.constraint.ConstraintLayout>

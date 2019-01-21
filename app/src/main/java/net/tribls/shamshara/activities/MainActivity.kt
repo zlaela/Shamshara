@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import io.socket.client.IO
 import io.socket.emitter.Emitter
+import kotlinx.android.synthetic.main.activity_create_account.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -29,13 +30,14 @@ import kotlinx.android.synthetic.main.nav_header_main.*
 import net.tribls.shamshara.App
 import net.tribls.shamshara.R
 import net.tribls.shamshara.models.Channel
+import net.tribls.shamshara.models.Message
 import net.tribls.shamshara.services.AuthService
 import net.tribls.shamshara.services.MessageService
 import net.tribls.shamshara.services.UserDataService
 import net.tribls.shamshara.utils.BROADCAST_USER_DATA_CHANGED
 import net.tribls.shamshara.utils.SOCKET_URL
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+class MainActivity : AppCompatActivity() {
     private lateinit var channelAdapter: ArrayAdapter<Channel>
     private val socket = IO.socket(SOCKET_URL)
 
@@ -77,17 +79,46 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val channelCreatedListener = Emitter.Listener { args ->
         // The API emits channel.name, channel.description, channel.id.
         // This is performed on a background thread, so update the list view on the main thread
-        runOnUiThread {
-            val channelName = args[0] as String
-            val channelDesc = args[1] as String
-            val channelId = args[2] as String
+        if(App.sharedPrefs.isLoggedIn){
+            runOnUiThread {
+                val channelName = args[0] as String
+                val channelDesc = args[1] as String
+                val channelId = args[2] as String
 
-            // Create a channel object
-            val newChannel  = Channel(channelName, channelDesc, channelId)
-            // Save it to the MessageService array
-            MessageService.channels.add(newChannel)
-            // Tell the adapter that a new channel was added so it can re-populate
-            channelAdapter.notifyDataSetChanged()
+                // Create a channel object
+                val newChannel  = Channel(channelName, channelDesc, channelId)
+                // Save it to the MessageService array
+                MessageService.channels.add(newChannel)
+                // Tell the adapter that a new channel was added so it can re-populate
+                channelAdapter.notifyDataSetChanged()
+            }
+        }
+    }
+    private val messageCreatedListener = Emitter.Listener { args ->
+
+        if(App.sharedPrefs.isLoggedIn){
+            // Run on the main thread
+            runOnUiThread {
+                // Extract from the args the values that we need
+                // we get back an object with in "messageCreated" with messageBody, userId, channelId, userName, userAvatar, userAvatarColor, id, timeStamp
+                val channelId = args[2] as String
+                // Check if the message belongs in the channel we're on
+                if(selectedChannel?.id == channelId) {
+                    val messageBody = args[0] as String
+                    // Skip userId since we're not using it
+                    val userName = args[3] as String
+                    val useAvatar = args[4] as String
+                    val userAvatarColor = args[5] as String
+                    val id = args[6] as String
+                    val timeStamp = args[7] as String
+
+                    // Create a new message object
+                    val message = Message(messageBody, userName, channelId, useAvatar, userAvatarColor, id, timeStamp)
+                    // Save it to the messages array in MessageServices
+                    MessageService.messages.add(message)
+                    // Tell the adapter that the dataset changed
+                }
+            }
         }
     }
 
@@ -113,6 +144,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         socket.connect()
         // Listen on the event, using the given listener
         socket.on("channelCreated", channelCreatedListener)
+        socket.on("messageCreated", messageCreatedListener)
 
         // If we're logged in, go ahead and fetch the information
         if(App.sharedPrefs.isLoggedIn) {
@@ -155,15 +187,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    override fun onClick(view: View?) {
-        when(view){
-            findViewById<AppCompatTextView>(R.id.login) -> onGoToLoginClicked()
-            findViewById<AppCompatImageButton>(R.id.add_channel) -> onAddChannelClicked()
-            findViewById<AppCompatImageButton>(R.id.send_message) -> onSendMessageClicked()
-        }
-    }
-
-    private fun onGoToLoginClicked() {
+    fun onGoToLoginClicked(view: View) {
         if(App.sharedPrefs.isLoggedIn){
             // Log Out
             UserDataService.logOut()
@@ -179,7 +203,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun onAddChannelClicked() {
+    fun onAddChannelClicked(view: View) {
         // Only logged in person can add a channel
         if(App.sharedPrefs.isLoggedIn) {
             val builder = AlertDialog.Builder(this)
@@ -202,9 +226,29 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun onSendMessageClicked() {
+    fun onSendMessageClicked(view: View) {
         // TODO: send message work here
         Toast.makeText(this, "clicked send message", Toast.LENGTH_SHORT).show()
+        // check we're logged in, check that there's text in th message box
+        if(App.sharedPrefs.isLoggedIn && message_text_field.text.isNotEmpty()) {
+            selectedChannel?.let { channel ->
+                val userId = UserDataService.id
+                val channelId = channel.id
+
+                // The API expects in "newMessage", messageBody, userId, channelId, userName, userAvatar, userAvatarColor
+                socket.emit("newMessage",
+                    message_text_field.text.toString(),
+                    userId,
+                    channelId,
+                    UserDataService.name,
+                    UserDataService.avatarName,
+                    UserDataService.avatarColor)
+                // Clear the textfield
+                message_text_field.text.clear()
+                // Hide the keyboard
+                hideKeyboard()
+            }
+        }
     }
 
     // <editor-fold desc="The 3-dot menu">

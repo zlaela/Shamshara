@@ -5,6 +5,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.JsonArrayRequest
 import net.tribls.shamshara.App
 import net.tribls.shamshara.models.Channel
+import net.tribls.shamshara.models.Message
 import net.tribls.shamshara.utils.URL_GET_CHANNELS
 import org.json.JSONException
 
@@ -17,6 +18,7 @@ object MessageService {
 
     // init empty list of channels
     val channels = ArrayList<Channel>()
+    val messages = ArrayList<Message>()
 
     // This is a GET request, so no reason for a request body
     fun getChannels(complete: (Boolean) -> Unit) {
