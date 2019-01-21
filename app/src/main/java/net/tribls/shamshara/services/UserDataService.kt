@@ -21,6 +21,10 @@ object UserDataService {
         App.sharedPrefs.authToken = ""
         App.sharedPrefs.userEmail = ""
         App.sharedPrefs.isLoggedIn = false
+
+        // Clear the messages and channels
+        MessageService.clearMessages()
+        MessageService.clearChannels()
     }
 
     fun getAvatarColor(): Int {

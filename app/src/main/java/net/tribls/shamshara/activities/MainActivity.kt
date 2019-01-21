@@ -191,10 +191,6 @@ class MainActivity : AppCompatActivity() {
         if(App.sharedPrefs.isLoggedIn){
             // Log Out
             UserDataService.logOut()
-            // clear the list of channels
-            MessageService.channels.clear()
-            channelAdapter.notifyDataSetChanged()
-
             resetUI()
         } else {
             // Go to the login screen
@@ -293,6 +289,16 @@ class MainActivity : AppCompatActivity() {
     // Function called whenever we select a channel from the populated list of channels
     private fun updateWithSelectedChannel() {
         current_channel_name.text = String.format(getString(R.string.channel_name_format), selectedChannel?.name)
-        // TODO: download messages for channel
+        // Download messages for the channel we're viewing
+        selectedChannel?.let {  channel ->
+            MessageService.getMessages(channel.id) { complete ->
+                if(complete) {
+                    for(i in MessageService.messages) {
+                        println(i.messageBody
+                        )
+                    }
+                }
+            }
+        }
     }
 }

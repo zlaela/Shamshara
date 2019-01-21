@@ -1,7 +1,7 @@
 package net.tribls.shamshara.models
 
 class Message(
-    val message: String,
+    val messageBody: String,
     val userName: String,
     val channelId: String,
     val useAvatar: String,
