@@ -63,19 +63,16 @@ class CreateAccountActivity : AppCompatActivity() {
                                 finish()
                             } else {
                                 // TODO: handle errors
-//                                Toast.makeText(this, "Failed to create user", Toast.LENGTH_LONG).show()
                                 makeToast()
                             }
                         }
                     } else {
                         // TODO: handle errors
-//                        Toast.makeText(this, "Log In failed", Toast.LENGTH_SHORT).show()
                         makeToast()
                     }
                 }
             } else {
                 // TODO: handle errors
-//                Toast.makeText(this, "Failed to create account", Toast.LENGTH_SHORT).show()
                 makeToast()
             }
         }

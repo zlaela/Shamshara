@@ -46,7 +46,6 @@ object AuthService {
             URL_REGISTER,
             Listener { response->
                 // Success listener
-                println("lailaaaa... response is $response")
                 complete(true)
             }, Response.ErrorListener { error->
                 // Error listener
@@ -93,7 +92,6 @@ object AuthService {
             null,
             Listener { response->
                 // Success listener
-                println("lailaaaa... response is $response")
                 // If there are no matching maps, catch the exception
                 try {
                     App.sharedPrefs.authToken = response.getString("token")

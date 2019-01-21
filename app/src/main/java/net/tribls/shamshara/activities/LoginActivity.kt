@@ -27,14 +27,12 @@ class LoginActivity : AppCompatActivity() {
                 AuthService.findUserByEmail(this) { fetchUserSuccess ->
 
                     if(fetchUserSuccess) {
-
-                        Toast.makeText(this, "Log In completed successfully", Toast.LENGTH_SHORT).show()
                         finish()
                     }else {
                         // TODO: handle errors
                         Toast.makeText(this, "Failed to fetch user", Toast.LENGTH_SHORT).show()
                     }
-                                    }
+                }
             } else {
                 // TODO: handle errors
                 Toast.makeText(this, "Log In failed", Toast.LENGTH_SHORT).show()

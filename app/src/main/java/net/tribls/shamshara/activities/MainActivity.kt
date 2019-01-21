@@ -12,23 +12,21 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.AppCompatEditText
-import android.support.v7.widget.AppCompatImageButton
-import android.support.v7.widget.AppCompatTextView
+import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import io.socket.client.IO
 import io.socket.emitter.Emitter
-import kotlinx.android.synthetic.main.activity_create_account.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 import net.tribls.shamshara.App
 import net.tribls.shamshara.R
+import net.tribls.shamshara.adapter.MessagesAdapter
 import net.tribls.shamshara.models.Channel
 import net.tribls.shamshara.models.Message
 import net.tribls.shamshara.services.AuthService
@@ -39,6 +37,7 @@ import net.tribls.shamshara.utils.SOCKET_URL
 
 class MainActivity : AppCompatActivity() {
     private lateinit var channelAdapter: ArrayAdapter<Channel>
+    private lateinit var messageAdapter: MessagesAdapter
     private val socket = IO.socket(SOCKET_URL)
 
     private var selectedChannel: Channel? = null
@@ -116,7 +115,12 @@ class MainActivity : AppCompatActivity() {
                     val message = Message(messageBody, userName, channelId, useAvatar, userAvatarColor, id, timeStamp)
                     // Save it to the messages array in MessageServices
                     MessageService.messages.add(message)
-                    // Tell the adapter that the dataset changed
+                    // Tell the adapter that we have messages
+                    messageAdapter.notifyDataSetChanged()
+                    // Scroll to the end
+                    if(messageAdapter.itemCount > 0) {
+                        messages_recycler_view.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                    }
                 }
             }
         }
@@ -145,7 +149,11 @@ class MainActivity : AppCompatActivity() {
         // Listen on the event, using the given listener
         socket.on("channelCreated", channelCreatedListener)
         socket.on("messageCreated", messageCreatedListener)
-
+        // Register a broadcast receiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            userDataChangedReceiver,
+            IntentFilter(BROADCAST_USER_DATA_CHANGED)
+        )
         // If we're logged in, go ahead and fetch the information
         if(App.sharedPrefs.isLoggedIn) {
             AuthService.findUserByEmail(this){
@@ -155,11 +163,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        // Register a broadcast receiver
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            userDataChangedReceiver,
-            IntentFilter(BROADCAST_USER_DATA_CHANGED)
-        )
         super.onResume()
         channel_list.setOnItemClickListener { _, _, i, _ ->
             // Set the selected channel to the one clicked
@@ -223,8 +226,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onSendMessageClicked(view: View) {
-        // TODO: send message work here
-        Toast.makeText(this, "clicked send message", Toast.LENGTH_SHORT).show()
         // check we're logged in, check that there's text in th message box
         if(App.sharedPrefs.isLoggedIn && message_text_field.text.isNotEmpty()) {
             selectedChannel?.let { channel ->
@@ -239,7 +240,7 @@ class MainActivity : AppCompatActivity() {
                     UserDataService.name,
                     UserDataService.avatarName,
                     UserDataService.avatarColor)
-                // Clear the textfield
+                // Clear the text field
                 message_text_field.text.clear()
                 // Hide the keyboard
                 hideKeyboard()
@@ -266,10 +267,14 @@ class MainActivity : AppCompatActivity() {
     //</editor-fold>
 
     private fun resetUI(){
+        // clear the adapters
+        channelAdapter.notifyDataSetChanged()
+        messageAdapter.notifyDataSetChanged()
         user_image.setImageResource(R.drawable.profiledefault)
         user_image.setBackgroundColor(Color.TRANSPARENT)
         user_name.text = getString(R.string.log_in)
         user_email.text = ""
+        current_channel_name.text = getString(R.string.log_in)
         login.text = getString(R.string.log_in)
     }
 
@@ -284,6 +289,10 @@ class MainActivity : AppCompatActivity() {
     private fun setupAdapter() {
         channelAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, MessageService.channels)
         channel_list.adapter = channelAdapter
+
+        messageAdapter = MessagesAdapter(this, MessageService.messages)
+        messages_recycler_view.adapter = messageAdapter
+        messages_recycler_view.layoutManager = LinearLayoutManager(this)
     }
 
     // Function called whenever we select a channel from the populated list of channels
@@ -293,9 +302,11 @@ class MainActivity : AppCompatActivity() {
         selectedChannel?.let {  channel ->
             MessageService.getMessages(channel.id) { complete ->
                 if(complete) {
-                    for(i in MessageService.messages) {
-                        println(i.messageBody
-                        )
+                    // Tell the adapter that we have messages
+                    messageAdapter.notifyDataSetChanged()
+                    // Scroll to the end
+                    if(messageAdapter.itemCount > 0){
+                        messages_recycler_view.smoothScrollToPosition(messageAdapter.itemCount -1)
                     }
                 }
             }
